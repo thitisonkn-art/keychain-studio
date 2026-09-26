@@ -1,107 +1,133 @@
 <!doctype html>
 <html lang="th">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Keychain Studio V3</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keychain Studio V5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;700&family=Mitr:wght@400;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Itim&family=Mali:wght@400;700&family=Mitr:wght@400;600;700&family=Prompt:wght@400;600;700&display=swap');
-*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Prompt,system-ui,sans-serif}
-header{height:64px;background:#fff;border-bottom:1px solid #e3e7ef;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
-.brand{font-weight:800;font-size:19px}.brand b{color:#6c5ce7}.actions{display:flex;gap:8px}button,select,input{font:inherit}button{border:1px solid #d9deea;background:#fff;border-radius:10px;padding:8px 11px;cursor:pointer;font-weight:600}.primary{background:#6c5ce7;color:white;border-color:#6c5ce7}
-.app{display:grid;grid-template-columns:245px minmax(360px,1fr) 285px;gap:12px;padding:12px;height:calc(100vh - 64px)}
-.panel,.viewer{background:#fff;border:1px solid #e2e6ee;border-radius:16px}.panel{padding:14px;overflow:auto}.viewer{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 35%,#fff,#e9edf5)}
-.section{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid #edf0f5}.section:last-child{border:0}h3{font-size:13px;margin:0 0 9px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.shapes{display:grid;grid-template-columns:1fr 1fr;gap:6px}.shape.active,.mode.active{background:#eeeaff;border-color:#6c5ce7;color:#5547c7}
-label{display:block;font-size:11px;color:#697386;font-weight:700;margin:7px 0 4px}input[type=text],input[type=number],select{width:100%;padding:8px;border:1px solid #d8deea;border-radius:8px;background:#fff}input[type=color]{width:100%;height:35px;border:0}
-.emoji-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.emoji{font-size:20px;padding:5px}
-#canvas{width:100%;height:100%;display:block}.hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:#ffffffdd;border:1px solid #e1e5ec;border-radius:99px;padding:6px 11px;font-size:10px;white-space:nowrap}
-.status{font-size:10px;line-height:1.5;color:#667085;background:#f7f8fb;border-radius:8px;padding:8px}
-@media(max-width:900px){.app{grid-template-columns:1fr;height:auto}.viewer{height:55vh;order:-1}.panel{overflow:visible}}
+*{box-sizing:border-box}body{margin:0;background:#10131a;color:#eef1f7;font-family:Prompt,system-ui,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.app{height:100vh;display:grid;grid-template-columns:310px 1fr;overflow:hidden}
+.sidebar{background:#171b23;border-right:1px solid #2b313d;overflow:auto;padding:16px}.logo{font-size:19px;font-weight:800;margin-bottom:16px}.logo span{color:#ff8b2c}
+.card{border:1px solid #303746;border-radius:14px;background:#1c212b;padding:12px;margin-bottom:12px}.title{font-size:12px;font-weight:700;margin-bottom:9px;color:#fff}
+input[type=text],input[type=number],select{width:100%;background:#11151d;color:#fff;border:1px solid #394151;border-radius:9px;padding:9px}label{display:block;font-size:10px;color:#aab1bf;margin:7px 0 4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tabs{display:flex;gap:5px}.tabs button,.tool{flex:1;border:1px solid #394151;background:#222834;color:#cbd1dc;border-radius:8px;padding:8px;font-size:11px}.tabs .active,.tool.active{background:#ff7b22;border-color:#ff7b22;color:#fff}
+.symbols{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sym{height:55px;border:1px solid #353c49;background:#202631;color:#fff;border-radius:10px;font-size:23px}.sym.active{outline:2px solid #ff842f;background:#29303c}
+.range{width:100%;accent-color:#ff7b22}.value{float:right;color:#ff9b5c}
+.stage{position:relative;background:#252a31;overflow:hidden}.toolbar{height:54px;background:#171b23;border-bottom:1px solid #303642;display:flex;align-items:center;gap:6px;padding:8px 12px}.toolbar button{border:1px solid #38404d;background:#222833;color:#d8dde6;border-radius:8px;padding:7px 12px;font-size:11px}.toolbar .active{background:#ff7b22;border-color:#ff7b22}
+.viewport{position:absolute;inset:54px 0 0;background-color:#282d34;background-image:linear-gradient(#363c45 1px,transparent 1px),linear-gradient(90deg,#363c45 1px,transparent 1px);background-size:32px 32px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.keychain{position:relative;width:min(680px,80vw);height:min(430px,60vh);transform-style:preserve-3d;transition:transform .12s;filter:drop-shadow(0 20px 15px #0008)}
+.base{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#ff8b18;border:2px solid #ff9e42;width:540px;height:300px;border-radius:75px 90px 75px 90px;box-shadow:0 0 0 13px #ff8b18,0 8px 0 #c95708}
+.ear{position:absolute;width:110px;height:110px;background:#ff8b18;top:-54px;border-radius:50% 50% 15% 15%;transform:rotate(45deg);border:2px solid #ff9e42}.ear.a{left:65px}.ear.b{right:65px}
+.hole{position:absolute;width:65px;height:65px;border-radius:50%;background:#282d34;border:12px solid #ff8b18;left:-76px;top:50%;transform:translateY(-50%)}
+.topText{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);font-size:92px;font-weight:700;font-family:Mali,Prompt,sans-serif;color:#fff;white-space:nowrap;text-shadow:0 5px 0 #cfd4dc,0 9px 12px #0005;letter-spacing:-3px}
+.emoji{position:absolute;top:24px;right:25px;font-size:65px;filter:drop-shadow(0 5px 0 #c95708)}
+.symbol{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:52px;color:#fff;filter:drop-shadow(0 4px 0 #cfd4dc)}
+.stats{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#11151dcc;border:1px solid #3b424f;border-radius:9px;padding:6px 12px;font-size:10px;color:#d6dbe5;white-space:nowrap}
+.toast{position:absolute;right:15px;top:70px;background:#171b23e8;border:1px solid #39404c;border-radius:10px;padding:9px 11px;font-size:10px;display:none}
+.footer{font-size:9px;color:#808895;line-height:1.5}
+@media(max-width:800px){.app{grid-template-columns:1fr}.sidebar{position:absolute;z-index:10;width:300px;height:100%;transform:translateX(-100%);transition:.2s}.sidebar.open{transform:none}.base{width:380px;height:220px}.topText{font-size:60px}.toolbar:before{content:'☰';font-size:22px;margin-right:5px}.viewport{inset:54px 0 0}}
 </style>
 </head>
 <body>
-<header><div class="brand">🔑 <b>Keychain Studio</b> V3</div><div class="actions"><button id="reset">↶ รีเซ็ต</button><button class="primary" id="download">⬇️ 3MF</button></div></header>
 <div class="app">
-<aside class="panel">
-<div class="section"><h3>🔑 รูปแบบ</h3><div class="shapes">
-<button class="shape active" data-s="round">⭕ วงกลม</button><button class="shape" data-s="tag">🏷️ ป้าย</button>
-<button class="shape" data-s="heart">❤️ หัวใจ</button><button class="shape" data-s="star">⭐ ดาว</button>
-<button class="shape" data-s="cloud">☁️ เมฆ</button><button class="shape" data-s="robot">🤖 Robot</button>
-</div></div>
-<div class="section"><h3>📏 ขนาด</h3><div class="grid">
-<div><label>กว้าง mm</label><input id="w" type="number" value="60"></div><div><label>สูง mm</label><input id="h" type="number" value="40"></div>
-</div><label>หนา mm</label><input id="t" type="number" value="4" step=".5"><label>รูห่วง mm</label><input id="hole" type="number" value="5" step=".5"></div>
-<div class="section"><h3>🎨 สี</h3><div class="grid"><div><label>ฐาน</label><input id="baseColor" type="color" value="#63a7ff"></div><div><label>ข้อความ</label><input id="textColor" type="color" value="#ffcf45"></div></div></div>
-</aside>
-<main class="viewer"><canvas id="canvas"></canvas><div class="hint">ลากเพื่อหมุน 360° • Pinch/ล้อเพื่อซูม</div></main>
-<aside class="panel">
-<div class="section"><h3>🔤 ข้อความ 3D</h3><label>ข้อความไทย / English</label><input id="text" value="ดวินท์" maxlength="22">
-<label>ฟอนต์</label><select id="font">
-<option value="Prompt">Prompt — น่ารักทันสมัย</option><option value="Mali">Mali — ลายมือ</option><option value="Itim">Itim — ขี้เล่น</option><option value="Mitr">Mitr — กลมสะอาด</option>
-</select>
-<label>ความสูงนูน <span id="thv">1.5</span> mm</label><input id="textH" type="range" min=".5" max="4" step=".1" value="1.5">
-<label>ขนาดข้อความ</label><input id="textSize" type="range" min="8" max="32" value="18">
-</div>
-<div class="section"><h3>😀 Emoji 3D</h3><div class="emoji-grid">
-<button class="emoji">😀</button><button class="emoji">😎</button><button class="emoji">🐻</button><button class="emoji">🐼</button><button class="emoji">🦖</button><button class="emoji">🚀</button><button class="emoji">⭐</button><button class="emoji">❤️</button><button class="emoji">⚡</button><button class="emoji">🤖</button>
-</div><label>ขนาด <span id="esv">12</span> mm</label><input id="emojiSize" type="range" min="6" max="24" value="12"></div>
-<div class="section"><h3>⬆️ แบบตัวอักษร</h3><div class="grid"><button id="emboss" class="mode active">นูน</button><button id="engrave" class="mode">จม</button></div></div>
-<div class="status">V3 ใช้ฟอนต์ไทยจาก Google Fonts และสร้างข้อความ/Emoji เป็นวัตถุบน Preview โดยตรง เพื่อให้เห็นผลทันทีขณะออกแบบ</div>
-</aside></div>
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
-import {TextGeometry} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/geometries/TextGeometry.js';
-import {FontLoader} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/FontLoader.js';
+<aside class="sidebar" id="sidebar">
+<div class="logo">🔑 Keychain <span>Studio</span> V5</div>
 
-const $=id=>document.getElementById(id), canvas=$('canvas');
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(38,1,.1,1000); camera.position.set(0,65,85);
-const controls=new OrbitControls(camera,canvas); controls.enableDamping=true; controls.target.set(0,0,0);
-scene.add(new THREE.HemisphereLight(0xffffff,0x6d7688,2.4)); const dl=new THREE.DirectionalLight(0xffffff,3);dl.position.set(30,70,50);scene.add(dl);
-const root=new THREE.Group();scene.add(root); let shape='round', emoji='⭐', mode='emboss', fontObj=null;
-const fonts={
- Prompt:'https://cdn.jsdelivr.net/gh/lazywasabi/thai-web-fonts@7/fonts/Prompt/Prompt-Regular.json',
- Mali:'https://cdn.jsdelivr.net/gh/lazywasabi/thai-web-fonts@7/fonts/Mali/Mali-Regular.json',
- Itim:'https://cdn.jsdelivr.net/gh/lazywasabi/thai-web-fonts@7/fonts/Itim/Itim-Regular.json',
- Mitr:'https://cdn.jsdelivr.net/gh/lazywasabi/thai-web-fonts@7/fonts/Mitr/Mitr-Regular.json'
-};
-const loader=new FontLoader();
-function loadFont(){loader.load(fonts[$('font').value],f=>{fontObj=f;rebuild()},undefined,()=>{})}
-function mat(c){return new THREE.MeshStandardMaterial({color:c,roughness:.3,metalness:.05})}
-function clear(){while(root.children.length)root.remove(root.children[0])}
-function extrude(points,d,c){const s=new THREE.Shape();s.moveTo(...points[0]);for(let i=1;i<points.length;i++)s.lineTo(...points[i]);s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:d,bevelEnabled:true,bevelSize:.7,bevelThickness:.35,bevelSegments:2});g.center();const m=new THREE.Mesh(g,mat(c));m.rotation.x=Math.PI/2;return m}
-function base(){
- const w=+$('w').value,h=+$('h').value,t=+$('t').value,c=new THREE.Color($('baseColor').value);
- if(shape==='round'){const m=new THREE.Mesh(new THREE.CylinderGeometry(Math.min(w,h)/2,Math.min(w,h)/2,t,64),mat(c));m.rotation.x=Math.PI/2;return m}
- if(shape==='tag')return new THREE.Mesh(new THREE.BoxGeometry(w,h,t),mat(c));
- if(shape==='heart'){let p=[];for(let i=0;i<=80;i++){let a=2*Math.PI*i/80,x=16*Math.sin(a)**3,y=13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a);p.push([x*w/34,y*h/34])}return extrude(p,t,c)}
- if(shape==='star'){let p=[];for(let i=0;i<10;i++){let a=-Math.PI/2+i*Math.PI/5,r=i%2?w/2:w/4;p.push([Math.cos(a)*r,Math.sin(a)*r])}return extrude(p,t,c)}
- if(shape==='cloud'){let p=[];for(let i=0;i<60;i++){let a=2*Math.PI*i/60,r=w*.36*(1+.15*Math.sin(3*a));p.push([Math.cos(a)*r,Math.sin(a)*r*h/w])}return extrude(p,t,c)}
- return extrude([[-w*.38,-h*.45],[w*.38,-h*.45],[w*.48,-h*.2],[w*.48,h*.45],[-w*.48,h*.45],[-w*.48,-h*.2]],t,c)
+<div class="card">
+<div class="title">ข้อความ / ชื่อพวงกุญแจ</div>
+<input id="name" type="text" value="พิชขา" placeholder="พิมพ์ชื่อไทยหรือ English">
+<label>ฟอนต์</label>
+<select id="font"><option>Mali</option><option>Itim</option><option>Prompt</option><option>Mitr</option></select>
+<label>ขนาดตัวอักษร <span class="value" id="sizeVal">92</span></label>
+<input class="range" id="size" type="range" min="35" max="130" value="92">
+</div>
+
+<div class="card">
+<div class="title">SYMBOLS / สัญลักษณ์</div>
+<div class="symbols" id="symbols"></div>
+<div class="footer" style="margin-top:8px">เลือกสัญลักษณ์แล้วกดเพื่อเปลี่ยนบนโมเดล สามารถเปลี่ยน Emoji ได้ทันที</div>
+</div>
+
+<div class="card">
+<div class="title">ตำแหน่ง / ขนาดสัญลักษณ์</div>
+<div class="tabs"><button class="tool active" data-tool="move">Move</button><button class="tool" data-tool="rotate">Rotate</button><button class="tool" data-tool="resize">Resize</button></div>
+<label>ตำแหน่ง X <span class="value" id="xVal">0</span></label><input class="range" id="x" type="range" min="-180" max="180" value="0">
+<label>ตำแหน่ง Y <span class="value" id="yVal">0</span></label><input class="range" id="y" type="range" min="-100" max="100" value="0">
+<label>หมุน <span class="value" id="rotVal">0°</span></label><input class="range" id="rot" type="range" min="-180" max="180" value="0">
+<label>ขนาดสัญลักษณ์ <span class="value" id="symVal">52</span></label><input class="range" id="symSize" type="range" min="20" max="100" value="52">
+</div>
+
+<div class="card">
+<div class="title">BASE / TOP</div>
+<div class="row"><div><label>Base mm</label><input id="base" type="number" value="1.7" step=".1"></div><div><label>Top mm</label><input id="top" type="number" value="1.9" step=".1"></div></div>
+<label>สีฐาน</label><input id="baseColor" type="color" value="#ff8b18">
+<label>สีตัวอักษร</label><input id="topColor" type="color" value="#ffffff">
+</div>
+
+<div class="card">
+<div class="title">รูห่วง</div>
+<div class="tabs"><button id="holeOn" class="tool active">เปิด</button><button id="holeOff" class="tool">ปิด</button></div>
+</div>
+
+<div class="card">
+<button id="reset" style="width:100%;border:0;background:#333a47;color:#fff;border-radius:9px;padding:10px">↺ Reset</button>
+</div>
+<div class="footer">V5 เป็นตัวออกแบบ/Preview ตามแนวคิดจากภาพตัวอย่าง: ฐานหนา + TOP นูน + สัญลักษณ์ + มุมมอง 3D</div>
+</aside>
+
+<main class="stage">
+<div class="toolbar">
+<button id="menu">☰ เมนู</button><button class="view active" data-view="perspective">Perspective</button><button class="view" data-view="front">Front</button><button class="view" data-view="top">Top</button>
+<div style="flex:1"></div><button id="download">⬇ Export 3MF</button>
+</div>
+<div class="viewport" id="viewport">
+<div class="keychain" id="keychain">
+<div class="base" id="baseObj"><div class="ear a"></div><div class="ear b"></div><div class="hole" id="holeObj"></div></div>
+<div class="topText" id="topText">พิชขา</div><div class="emoji" id="emoji">🐱</div><div class="symbol" id="symbol">♣</div>
+</div>
+<div class="stats">BASE <b id="baseStat">1.7 mm</b> &nbsp; TOP <b id="topStat">3.6 mm</b> &nbsp; Orbit: drag empty space · Zoom wheel</div>
+<div class="toast" id="toast"></div>
+</div>
+</main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const symbols=['✦','☆','★','♡','♥','♢','♣','♠','←','↑','↓','→','°','№','✣','♕','♧','☀','☁','⚡','✿','❖','☘','🐱','🐻','🦖','🚀','😀','😎','❤️'];
+let selected='♣';
+$('symbols').innerHTML=symbols.map((s,i)=>`<button class="sym ${i===6?'active':''}" data-s="${s}">${s}</button>`).join('');
+document.querySelectorAll('.sym').forEach(b=>b.onclick=()=>{document.querySelectorAll('.sym').forEach(x=>x.classList.remove('active'));b.classList.add('active');selected=b.dataset.s;renderSymbol()});
+function renderSymbol(){
+ const s=selected;
+ if(['🐱','🐻','🦖','🚀','😀','😎','❤️'].includes(s)){ $('emoji').textContent=s;$('emoji').style.display='block';$('symbol').style.display='none';}
+ else {$('symbol').textContent=s;$('symbol').style.display='block';$('emoji').style.display='none';}
 }
-function hole(){const w=+$('w').value,h=+$('h').value,r=+$('hole').value/2;const g=new THREE.TorusGeometry(r+.7,.7,12,32);const m=new THREE.Mesh(g,mat('#293044'));m.rotation.x=Math.PI/2;m.position.set(w/2-7,0,h/2-7);root.add(m)}
-function addText(){
- if(!fontObj||!$('text').value)return;
- const size=+$('textSize').value, depth=+$('textH').value, geo=new TextGeometry($('text').value,{font:fontObj,size:size,height:depth,curveSegments:4,bevelEnabled:true,bevelThickness:.25,bevelSize:.2,bevelSegments:2});
- geo.computeBoundingBox(); const box=geo.boundingBox, tw=box.max.x-box.min.x; geo.translate(-tw/2,-(box.max.y-box.min.y)/2,0);
- const m=new THREE.Mesh(geo,mat($('textColor').value)); m.rotation.x=-Math.PI/2; m.position.set(0,+$('t').value/2+(mode==='emboss'?depth:-.05),0); if(mode==='engrave')m.material.color.set('#777'); root.add(m)
-}
-function addEmoji(){
- const cvs=document.createElement('canvas');cvs.width=cvs.height=512;const x=cvs.getContext('2d');x.textAlign='center';x.textBaseline='middle';x.font='340px sans-serif';x.fillText(emoji,256,275);
- const tex=new THREE.CanvasTexture(cvs),s=+$('emojiSize').value,g=new THREE.PlaneGeometry(s,s),m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}));
- m.rotation.x=-Math.PI/2;m.position.set(+$('w').value/3,+$('t').value/2+(mode==='emboss'?+$('textH').value:.05),0);root.add(m)
-}
-function rebuild(){clear();root.add(base());hole();addText();addEmoji()}
-document.querySelectorAll('.shape').forEach(b=>b.onclick=()=>{document.querySelectorAll('.shape').forEach(x=>x.classList.remove('active'));b.classList.add('active');shape=b.dataset.s;rebuild()});
-document.querySelectorAll('.emoji').forEach(b=>b.onclick=()=>{emoji=b.textContent;rebuild()});
-['w','h','t','hole','text','baseColor','textColor','textH','textSize','emojiSize'].forEach(id=>$(id).addEventListener('input',()=>{if(id==='font')return;$('thv').textContent=$('textH').value;$('esv').textContent=$('emojiSize').value;rebuild()}));
-$('font').onchange=loadFont;
-$('emboss').onclick=()=>{mode='emboss';$('emboss').classList.add('active');$('engrave').classList.remove('active');rebuild()};
-$('engrave').onclick=()=>{mode='engrave';$('engrave').classList.add('active');$('emboss').classList.remove('active');rebuild()};
-$('reset').onclick=()=>{camera.position.set(0,65,85);controls.target.set(0,0,0);controls.update();rebuild()};
-function resize(){const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
-(function anim(){requestAnimationFrame(anim);controls.update();renderer.render(scene,camera)})();
-loadFont();
-$('download').onclick=()=>alert('ระบบ Export 3MF จะเชื่อมกับ geometry จริงในขั้นถัดไป — Preview V3 พร้อมใช้งานแล้ว');
+function bind(id,fn){$(id).addEventListener('input',fn)}
+bind('name',()=>{$('topText').textContent=$('name').value||'ชื่อ';});
+bind('font',()=>{$('topText').style.fontFamily=$('font').value+',Prompt,sans-serif'});
+bind('size',()=>{$('topText').style.fontSize=$('size').value+'px';$('sizeVal').textContent=$('size').value});
+bind('symSize',()=>{$('symbol').style.fontSize=$('symSize').value+'px';$('emoji').style.fontSize=$('symSize').value+'px';$('symVal').textContent=$('symSize').value});
+bind('x',()=>{let v=+$('x').value;$('symbol').style.marginLeft=v+'px';$('emoji').style.marginLeft=v+'px';$('xVal').textContent=v});
+bind('y',()=>{let v=+$('y').value;$('symbol').style.marginBottom=v+'px';$('emoji').style.marginBottom=v+'px';$('yVal').textContent=v});
+bind('rot',()=>{let v=+$('rot').value;$('symbol').style.rotate=v+'deg';$('emoji').style.rotate=v+'deg';$('rotVal').textContent=v+'°'});
+bind('baseColor',()=>{$('baseObj').style.background=$('baseColor').value});
+bind('topColor',()=>{$('topText').style.color=$('topColor').value;$('symbol').style.color=$('topColor').value;$('emoji').style.color=$('topColor').value});
+bind('base',()=>{$('baseStat').textContent=$('base').value+' mm'});
+bind('top',()=>{$('topStat').textContent=(+$('base').value + +$('top').value).toFixed(1)+' mm'});
+$('holeOn').onclick=()=>{$('holeObj').style.display='block';$('holeOn').classList.add('active');$('holeOff').classList.remove('active')};
+$('holeOff').onclick=()=>{$('holeObj').style.display='none';$('holeOff').classList.add('active');$('holeOn').classList.remove('active')};
+document.querySelectorAll('.view').forEach(b=>b.onclick=()=>{document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));b.classList.add('active');let v=b.dataset.view;if(v==='front')$('keychain').style.transform='perspective(900px) rotateX(0deg) rotateY(0deg)';else if(v==='top')$('keychain').style.transform='perspective(900px) rotateX(65deg) rotateY(0deg)';else $('keychain').style.transform='perspective(900px) rotateX(18deg) rotateY(-12deg)'});
+let dragging=false,lastX=0,lastY=0,rx=18,ry=-12;
+$('viewport').addEventListener('pointerdown',e=>{if(e.target.closest('.sidebar'))return;dragging=true;lastX=e.clientX;lastY=e.clientY});
+addEventListener('pointerup',()=>dragging=false);
+addEventListener('pointermove',e=>{if(!dragging)return;ry+=(e.clientX-lastX)*.35;rx-=(e.clientY-lastY)*.25;lastX=e.clientX;lastY=e.clientY;$('keychain').style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`});
+$('viewport').addEventListener('wheel',e=>{e.preventDefault();let s=Math.max(.65,Math.min(1.5,parseFloat(getComputedStyle($('keychain')).scale||1)-e.deltaY*.0005));$('keychain').style.scale=s}, {passive:false});
+$('menu').onclick=()=>$('sidebar').classList.toggle('open');
+$('reset').onclick=()=>location.reload();
+$('download').onclick=()=>{let t=$('toast');t.textContent='V5 Preview พร้อมแล้ว — ขั้นต่อไปเชื่อม Export 3MF Geometry จริง';t.style.display='block';setTimeout(()=>t.style.display='none',2500)};
+$('top').dispatchEvent(new Event('input'));renderSymbol();$('topText').style.fontFamily='Mali,Prompt,sans-serif';
 </script>
-</body></html>
+</body>
+</html>
