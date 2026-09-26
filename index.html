@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keychain Studio — ออกแบบพวงกุญแจ 3D</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5f9;color:#182033;font-family:system-ui,-apple-system,"Noto Sans Thai","Noto Sans",sans-serif}
+header{height:66px;background:#fff;border-bottom:1px solid #e4e8ef;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:5}
+.brand{font-weight:900;font-size:20px}.brand span{color:#635bff}.top-actions{display:flex;gap:8px}
+button,select,input{font:inherit}button{border:1px solid #dce1ea;background:#fff;border-radius:10px;padding:9px 12px;font-weight:750;cursor:pointer}
+button:hover{filter:brightness(.98)}.primary{background:#635bff;color:#fff;border-color:#635bff}
+.app{display:grid;grid-template-columns:250px minmax(360px,1fr) 290px;gap:14px;padding:14px;height:calc(100vh - 66px)}
+.panel{background:#fff;border:1px solid #e3e7ee;border-radius:16px;padding:15px;overflow:auto}
+.section{padding-bottom:15px;margin-bottom:15px;border-bottom:1px solid #edf0f4}.section:last-child{border-bottom:0}
+h3{font-size:14px;margin:0 0 10px}.small{font-size:11px;color:#697386}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+input[type=text],input[type=number],select{width:100%;padding:9px;border:1px solid #d8dde7;border-radius:9px;background:#fff}
+input[type=color]{width:100%;height:38px;border:0;background:transparent;padding:0}
+label{display:block;font-size:11px;font-weight:750;color:#667085;margin:8px 0 5px}
+.shapes{display:grid;grid-template-columns:1fr 1fr;gap:7px}.shape.active{border-color:#635bff;background:#f1efff;color:#463dd1}
+.emoji-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.emoji{font-size:21px;padding:6px}
+.viewer{position:relative;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#fff 0,#edf1f7 70%);border:1px solid #e0e5ed}
+#canvas{width:100%;height:100%;display:block}.hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:#ffffffdf;border:1px solid #e2e6ed;border-radius:999px;padding:7px 12px;font-size:11px;white-space:nowrap}
+.swatches{display:grid;grid-template-columns:1fr 42px;gap:8px;align-items:center;margin:7px 0}.swatches span{font-size:12px;font-weight:700}
+.full{width:100%}.status{font-size:11px;line-height:1.5;background:#f7f8fb;padding:9px;border-radius:9px;color:#596273;margin-top:9px}
+.range{width:100%}
+@media(max-width:950px){.app{grid-template-columns:1fr;height:auto}.viewer{height:55vh;order:-1}.panel{overflow:visible}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">🔑 <span>Keychain Studio</span></div>
+ <div class="top-actions"><button id="reset">↶ รีเซ็ต</button><button class="primary" id="download">⬇️ ดาวน์โหลด 3MF</button></div>
+</header>
+<div class="app">
+<aside class="panel">
+ <div class="section">
+  <h3>🔑 รูปแบบพวงกุญแจ</h3>
+  <div class="shapes">
+   <button class="shape active" data-shape="round">⭕ วงกลม</button>
+   <button class="shape" data-shape="tag">🏷️ ป้าย</button>
+   <button class="shape" data-shape="heart">❤️ หัวใจ</button>
+   <button class="shape" data-shape="star">⭐ ดาว</button>
+   <button class="shape" data-shape="cloud">☁️ เมฆ</button>
+   <button class="shape" data-shape="robot">🤖 Robot</button>
+  </div>
+ </div>
+ <div class="section">
+  <h3>📏 ขนาด</h3>
+  <div class="grid2"><div><label>กว้าง mm</label><input id="w" type="number" value="60" min="25" max="120"></div><div><label>สูง mm</label><input id="h" type="number" value="35" min="20" max="100"></div></div>
+  <label>ความหนา mm</label><input id="t" type="number" value="4" min="2" max="8" step=".5">
+  <label>รูห่วง mm</label><input id="hole" type="number" value="5" min="3" max="10" step=".5">
+ </div>
+ <div class="section">
+  <h3>🎨 สี</h3>
+  <div class="swatches"><span>ฐาน</span><input id="baseColor" type="color" value="#5B8DEF"></div>
+  <div class="swatches"><span>ตัวอักษร</span><input id="textColor" type="color" value="#FFD84D"></div>
+  <div class="swatches"><span>Emoji</span><input id="emojiColor" type="color" value="#FF5B6E"></div>
+ </div>
+</aside>
+
+<main class="viewer"><canvas id="canvas"></canvas><div class="hint">ลาก = หมุน 360° • ล้อ/Pinch = ซูม</div></main>
+
+<aside class="panel">
+ <div class="section">
+  <h3>🔤 ข้อความนูน</h3>
+  <label>ข้อความ ภาษาไทย / English</label><input id="text" type="text" value="ดวินท์" maxlength="24">
+  <label>ฟอนต์</label>
+  <select id="font"><option value="round">น่ารักกลม</option><option value="bold">ตัวหนา</option><option value="hand">ลายมือ</option><option value="modern">Modern</option></select>
+  <label>ความสูงตัวนูน <span id="heightLabel">1.2</span> mm</label><input id="textH" class="range" type="range" min=".5" max="3" value="1.2" step=".1">
+  <label>ตำแหน่งข้อความ</label><input id="textX" class="range" type="range" min="-20" max="20" value="0" step="1">
+ </div>
+ <div class="section">
+  <h3>😀 Emoji</h3>
+  <div class="emoji-grid">
+   <button class="emoji">😀</button><button class="emoji">😎</button><button class="emoji">🐻</button><button class="emoji">🐼</button><button class="emoji">🦖</button>
+   <button class="emoji">🚀</button><button class="emoji">⭐</button><button class="emoji">❤️</button><button class="emoji">⚡</button><button class="emoji">🤖</button>
+  </div>
+  <label>ขนาด Emoji <span id="emojiLabel">12</span> mm</label><input id="emojiSize" class="range" type="range" min="6" max="22" value="12">
+  <label>ตำแหน่ง Emoji</label><input id="emojiX" class="range" type="range" min="-25" max="25" value="18">
+ </div>
+ <div class="section">
+  <h3>⬆️ รูปแบบ</h3>
+  <div class="grid2"><button id="emboss" class="active">นูน</button><button id="engrave">จม</button></div>
+  <div class="status">ตัวอย่างนี้สร้าง Preview แบบ 3D และสร้างไฟล์ 3MF สำหรับนำไปพัฒนาต่อใน Bambu Studio</div>
+ </div>
+</aside>
+</div>
+
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+import {OrbitControls} from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js";
+import {RoundedBoxGeometry} from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/geometries/RoundedBoxGeometry.js";
+
+const canvas=document.querySelector("#canvas"), renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(38,1,.1,1000);
+camera.position.set(0,52,78);
+const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.target.set(0,0,0);
+scene.add(new THREE.HemisphereLight(0xffffff,0x738096,2.5));
+const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(30,70,50);scene.add(light);
+const root=new THREE.Group();scene.add(root);
+let shape="round",emoji="⭐",mode="emboss";
+
+function C(id){return new THREE.Color(document.querySelector(id).value)}
+function clear(){while(root.children.length)root.remove(root.children[0])}
+function M(c){return new THREE.MeshStandardMaterial({color:c,roughness:.32,metalness:.08})}
+function extrude(points,d,c){let s=new THREE.Shape();s.moveTo(...points[0]);for(let i=1;i<points.length;i++)s.lineTo(...points[i]);s.closePath();let g=new THREE.ExtrudeGeometry(s,{depth:d,bevelEnabled:true,bevelSize:.7,bevelThickness:.4,bevelSegments:2});g.center();let m=new THREE.Mesh(g,M(c));m.rotation.x=Math.PI/2;return m}
+function base(){
+ let w=+wEl.value,h=+hEl.value,t=+tEl.value,c=C("#baseColor");
+ if(shape==="round"){let m=new THREE.Mesh(new THREE.CylinderGeometry(Math.min(w,h)/2,t,64),M(c));m.rotation.x=Math.PI/2;return m}
+ if(shape==="tag")return new THREE.Mesh(new RoundedBoxGeometry(w,h,t,6,3),M(c));
+ if(shape==="heart"){let p=[];for(let i=0;i<=80;i++){let a=2*Math.PI*i/80,x=16*Math.sin(a)**3,y=13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a);p.push([x*w/34,y*h/34])}return extrude(p,t,c)}
+ if(shape==="star"){let p=[];for(let i=0;i<10;i++){let a=-Math.PI/2+i*Math.PI/5,r=i%2?w/2:w/4;p.push([Math.cos(a)*r,Math.sin(a)*r])}return extrude(p,t,c)}
+ if(shape==="cloud"){let p=[];for(let i=0;i<60;i++){let a=2*Math.PI*i/60,r=w*.36*(1+.15*Math.sin(3*a)+.08*Math.sin(7*a));p.push([Math.cos(a)*r,Math.sin(a)*r*h/w])}return extrude(p,t,c)}
+ let p=[[-w*.35,-h*.45],[w*.35,-h*.45],[w*.48,-h*.2],[w*.48,h*.45],[-w*.48,h*.45],[-w*.48,-h*.2]];return extrude(p,t,c)
+}
+function addHole(){
+ let w=+wEl.value,h=+hEl.value,r=+holeEl.value/2,g=new THREE.TorusGeometry(r+.5,.65,12,32),m=new THREE.Mesh(g,M("#222938"));
+ m.rotation.x=Math.PI/2;m.position.set(w/2-7,0,h/2-7);root.add(m)
+}
+function textMesh(){
+ let s=textEl.value||"TEXT",cvs=document.createElement("canvas");cvs.width=1400;cvs.height=260;let x=cvs.getContext("2d");
+ let fam={round:"system-ui",bold:"Arial",hand:"cursive",modern:"sans-serif"}[fontEl.value];x.clearRect(0,0,1400,260);x.textAlign="center";x.textBaseline="middle";x.font="800 120px "+fam;x.fillStyle=textColor.value;x.fillText(s,700,130);
+ let tex=new THREE.CanvasTexture(cvs),w=Math.min(46,Math.max(18,s.length*7)),g=new THREE.PlaneGeometry(w,9),m=new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}),q=new THREE.Mesh(g,m);
+ q.rotation.x=-Math.PI/2;q.position.set(+textX.value,+tEl.value/2+(mode==="emboss"?+textH.value:.05),0);root.add(q)
+}
+function emojiMesh(){
+ let cvs=document.createElement("canvas");cvs.width=256;cvs.height=256;let x=cvs.getContext("2d");x.textAlign="center";x.textBaseline="middle";x.font="170px sans-serif";x.fillText(emoji,128,138);
+ let q=new THREE.Mesh(new THREE.PlaneGeometry(+emojiSize.value,+emojiSize.value),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cvs),transparent:true,side:THREE.DoubleSide}));
+ q.rotation.x=-Math.PI/2;q.position.set(+emojiX.value,+tEl.value/2+(mode==="emboss"?+textH.value:.05),0);root.add(q)
+}
+function rebuild(){clear();root.add(base());addHole();textMesh();emojiMesh()}
+const wEl=w,hEl=h,tEl=t,holeEl=hole,textEl=text,fontEl=font;
+document.querySelectorAll(".shape").forEach(b=>b.onclick=()=>{document.querySelectorAll(".shape").forEach(x=>x.classList.remove("active"));b.classList.add("active");shape=b.dataset.shape;rebuild()});
+document.querySelectorAll(".emoji").forEach(b=>b.onclick=()=>{emoji=b.textContent;rebuild()});
+["w","h","t","hole","text","font","baseColor","textColor","emojiColor","textH","textX","emojiSize","emojiX"].forEach(id=>document.querySelector("#"+id).addEventListener("input",()=>{heightLabel.textContent=textH.value;emojiLabel.textContent=emojiSize.value;rebuild()}));
+emboss.onclick=()=>{mode="emboss";emboss.classList.add("active");engrave.classList.remove("active");rebuild()};engrave.onclick=()=>{mode="engrave";engrave.classList.add("active");emboss.classList.remove("active");rebuild()};
+reset.onclick=()=>{controls.reset();camera.position.set(0,52,78);rebuild()};
+function resize(){let r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}addEventListener("resize",resize);resize();
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();rebuild();
+
+async function download3MF(){
+ const mod=await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm"),Zip=mod.default||mod,z=new Zip();
+ const W=+wEl.value,H=+hEl.value,T=+tEl.value,bc=baseColor.value,tc=textColor.value,ec=emojiColor.value;
+ const v=[[-W/2,0,-H/2],[W/2,0,-H/2],[W/2,0,H/2],[-W/2,0,H/2],[-W/2,T,-H/2],[W/2,T,-H/2],[W/2,T,H/2],[-W/2,T,H/2]];
+ const f=[[0,1,2],[0,2,3],[4,6,5],[4,7,6],[0,4,5],[0,5,1],[1,5,6],[1,6,2],[2,6,7],[2,7,3],[3,7,4],[3,4,0]];
+ const V=v.map(a=>`<vertex x="${a[0]}" y="${a[1]}" z="${a[2]}"/>`).join(""),F=f.map(a=>`<triangle v1="${a[0]}" v2="${a[1]}" v3="${a[2]}"/>`).join("");
+ const model=`<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><basematerials id="1"><base name="Base" displaycolor="${bc}"/></basematerials><object id="1" type="model"><mesh><vertices>${V}</vertices><triangles>${F}</triangles></mesh><metadata name="Text">${textEl.value}</metadata><metadata name="TextColor">${tc}</metadata><metadata name="Emoji">${emoji}</metadata><metadata name="EmojiColor">${ec}</metadata><metadata name="Shape">${shape}</metadata><metadata name="ReliefMode">${mode}</metadata></object></resources><build><item objectid="1"/></build></model>`;
+ const rel=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>`;
+ const types=`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>`;
+ z.file("[Content_Types].xml",types);z.folder("_rels").file(".rels",rel);z.folder("3D").file("3dmodel.model",model);
+ let blob=await z.generateAsync({type:"blob"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(textEl.value||"My_Keychain").replace(/[^\wก-๙]+/g,"_")+".3mf";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)
+}
+download.onclick=download3MF;
+</script>
+</body>
+</html>
